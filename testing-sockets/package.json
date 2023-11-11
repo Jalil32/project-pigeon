@@ -1,0 +1,11 @@
+{
+	"name": "socket-chat-example",
+	"version": "0.0.1",
+	"description": "Pigeon 1.0",
+	"type": "commonjs",
+	"dependencies": {
+		"@types/node": "^20.9.0",
+		"express": "^4.18.2",
+		"socket.io": "^4.7.2"
+	}
+}
