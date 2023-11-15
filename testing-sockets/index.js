@@ -20,6 +20,6 @@ io.on('connection', function (socket) {
         io.emit('chat message', msg);
     });
 });
-server.listen(3000, '192.168.43.87', function () {
+server.listen(3000, 'localhost', function () {
     console.log('SERVER RUNNING @ http://localhost:3000');
 });

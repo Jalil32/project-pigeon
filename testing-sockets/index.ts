@@ -19,9 +19,9 @@ app.get('/pigeon', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-	console.log('NEW PIGEON ARRIVED!');
+	// console.log('NEW PIGEON ARRIVED!');
 	socket.on('disconnect', () => {
-		console.log("A PIGEON FLEW AWAY!");
+		//console.log("A PIGEON FLEW AWAY!");
 	});
 	socket.on('chat message', (msg) => {
 		io.emit('chat message', msg);
@@ -29,6 +29,6 @@ io.on('connection', (socket) => {
 });
 
 
-server.listen(3000,'192.168.43.87', () => {
+server.listen(3000,'localhost', () => {
 	console.log('SERVER RUNNING @ http://localhost:3000');
 });
