@@ -1,0 +1,26 @@
+[
+  {
+    "chatId": "unique_chat_identifier",
+    "chatName": "Group Chat Name",
+    "participants": ["user1_id", "user2_id", "user3_id"],
+    "messages": ["unique_message_identifier_1", "unique_message_identifier_2"],
+    "createdAt": "2023-11-01T10:00:00Z",
+    "createdBy": "user_creator_id"
+  },
+  {
+    "chatId": "69NOa_6zIiS7mAdvt4ouw",
+    "chatName": "development-team",
+    "participants": ["uuid10", "uuid11"],
+    "messages": [],
+    "createdAt": "201023120",
+    "createdBy": "Jalil"
+  },
+  {
+    "chatId": "G1oTHaZCBiw3sEUJXicaE",
+    "chatName": "development-team",
+    "participants": ["uuid10", "uuid11"],
+    "messages": [],
+    "createdAt": "201023120",
+    "createdBy": "Jalil"
+  }
+]
