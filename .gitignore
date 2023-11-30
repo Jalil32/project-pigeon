@@ -2,3 +2,4 @@
 /backend/node_modules
 /backend/my-app/node_modules
 /node_modules
+/backend/config.env
