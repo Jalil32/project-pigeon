@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -19,29 +23,25 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 const mongoose_1 = __importStar(require("mongoose"));
-// Group Schema
-const groupSchema = new mongoose_1.default.Schema({
-    name: {
-        type: String,
-        requied: true,
-        unique: true,
-    },
-    creator: {
+// Message Schema
+const messageSchema = new mongoose_1.default.Schema({
+    sentFrom: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: 'Users',
+        required: true,
     },
-    members: [
-        {
-            type: mongoose_1.Schema.Types.ObjectId,
-            ref: 'Users',
-        },
-    ],
-    messages: [
-        {
-            type: mongoose_1.Schema.Types.ObjectId,
-            ref: 'Messages',
-        },
-    ],
+    content: { type: String, required: true },
+    timestamp: { type: Date, default: Date.UTC },
+    recipient: {
+        required: true,
+        type: mongoose_1.Schema.Types.ObjectId,
+        refPath: 'onModel',
+    },
+    onModel: {
+        type: String,
+        required: true,
+        enum: ['Groups', 'Users'],
+    },
 });
-const Groups = mongoose_1.default.model('Groups', groupSchema);
-module.exports = Groups;
+const Messages = mongoose_1.default.model('Messages', messageSchema);
+module.exports = Messages;

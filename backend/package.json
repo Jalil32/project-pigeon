@@ -6,12 +6,13 @@
   "scripts": {
     "build": "tsc",
     "start": "ts-node server.ts",
-    "dev": "nodemon server.ts"
+    "dev": "tsc && nodemon server.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@types/nanoid": "^3.0.0",
+    "bcryptjs": "^2.4.3",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "fs": "^0.0.1-security",
@@ -21,9 +22,13 @@
     "validator": "^13.11.0"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/express": "^4.17.21",
+    "@types/morgan": "^1.9.9",
     "@types/node": "^20.10.0",
     "@types/validator": "^13.11.7",
+    "morgan": "^1.10.0",
+    "ndb": "^0.2.4",
     "nodemon": "^3.0.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
