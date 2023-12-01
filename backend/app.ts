@@ -13,6 +13,7 @@ const app: Express = express();
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'my-app', 'build')));
 
@@ -21,9 +22,11 @@ app.use('/', reactAppRouter);
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/group', groupRouter);
 
-app.all('*', (req: Request, res: Response, next: NextFunction) => {
+app.all('*', (req: Request, _res: Response, next: NextFunction) => {
     next(new AppError(`Can't find ${req.url} on this server!`, 404));
 });
 
+// GLOBAL ERROR HANDLER
+// This is called if any value is passed to next anywhere in the application
 app.use(globalErrorHandler);
 export = app;
