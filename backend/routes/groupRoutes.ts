@@ -6,12 +6,16 @@ import {
     addGroupMember,
     deleteGroup,
 } from './../controllers/groupController';
-import { protect } from './../controllers/authController';
+import { protect, restrictTo } from './../controllers/authController';
 
 const router = express.Router();
 
 router.route('/').get(protect, getAllGroups).post(createGroup);
 
-router.route('/:id').get(getGroup).patch(addGroupMember).delete(deleteGroup);
+router
+    .route('/:id')
+    .get(protect, getGroup)
+    .patch(protect, addGroupMember)
+    .delete(protect, restrictTo('admin'), deleteGroup);
 
 export = router;

@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -64,6 +60,7 @@ const userSchema = new mongoose_1.Schema({
             ref: 'Groups',
         },
     ],
+    passwordChangedAt: Date,
 });
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
@@ -75,6 +72,15 @@ userSchema.pre('save', async function (next) {
 });
 userSchema.methods.correctPassword = async function (candidatePassword, userPassword) {
     return await bcryptjs_1.default.compare(candidatePassword, userPassword);
+};
+// Instance methods
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+    if (this.passwordChangedAt) {
+        const changedTimestamp = this.passwordChangedAt.getTime() / 1000;
+        console.log(this.passwordChangedAt, JWTTimestamp);
+    }
+    console.log('exist');
+    return false;
 };
 const Users = mongoose_1.default.model('Users', userSchema);
 module.exports = Users;

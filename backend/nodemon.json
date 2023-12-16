@@ -1,6 +1,5 @@
 {
   "ignore": ["node_modules"],
-  "watch": ["./*/**"],
-  "exec": "tsc && npm start",
+  "watch": ["."],
   "ext": "ts"
 }

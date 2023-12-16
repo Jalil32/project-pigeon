@@ -1,11 +1,11 @@
 import mongoose, { Schema } from 'mongoose';
-console.log('hello');
+
 // Group Schema
 const groupSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, 'A group must have a name'],
-        unique: true,
+        unique: [true, 'A group with this name already exists.'],
     },
     creator: {
         type: Schema.Types.ObjectId,

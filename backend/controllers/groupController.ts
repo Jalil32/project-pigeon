@@ -39,7 +39,10 @@ export const addGroupMember = catchAsync(
         );
 
         // 4) Add group to user
-        await Users.updateOne({ _id: req.body._id }, { $push: { groups: req.params.id } });
+        await Users.updateOne(
+            { _id: req.body._id },
+            { $push: { groups: req.params.id } },
+        );
 
         res.status(200).send({
             status: 'success',
@@ -56,7 +59,10 @@ export const createGroup = catchAsync(async (req: Request, res: Response) => {
 
     console.log('Created group: \n' + group);
 
-    await Users.updateMany({ _id: { $in: group.members } }, { $push: { groups: group._id } });
+    await Users.updateMany(
+        { _id: { $in: group.members } },
+        { $push: { groups: group._id } },
+    );
 
     res.status(200).send({
         status: 'success',
@@ -66,44 +72,48 @@ export const createGroup = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-export const deleteGroup = catchAsync(async (req: Request, res: Response) => {
-    const group = await Groups.findByIdAndDelete(req.params.id, {
-        returnDocument: 'before',
-    });
+export const deleteGroup = catchAsync(
+    async (req: Request, res: Response): Promise<void> => {
+        const group = await Groups.findByIdAndDelete(req.params.id, {
+            returnDocument: 'before',
+        });
 
-    console.log('group deleted: ' + group);
-    if (group) {
-        await Users.updateMany(
-            {
-                groups: {
-                    $elemMatch: {
-                        $eq: group._id,
+        console.log('group deleted: ' + group);
+        if (group) {
+            await Users.updateMany(
+                {
+                    groups: {
+                        $elemMatch: {
+                            $eq: group._id,
+                        },
                     },
                 },
+                { $pull: { groups: group._id } },
+            );
+            console.log('users updated');
+        }
+
+        res.status(200).send({
+            status: 'success',
+            data: {
+                group,
             },
-            { $pull: { groups: group._id } },
-        );
-        console.log('users updated');
-    }
+        });
+    },
+);
 
-    res.status(200).send({
-        status: 'success',
-        data: {
-            group,
-        },
-    });
-});
+export const getGroup = catchAsync(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const group = await Groups.findById(req.params.id);
 
-export const getGroup = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const group = await Groups.findById(req.params.id);
-
-    if (!group) {
-        return next(new AppError('No tour found with that ID', 404));
-    }
-    res.status(200).send({
-        status: 'success',
-        data: {
-            group,
-        },
-    });
-});
+        if (!group) {
+            return next(new AppError('No tour found with that ID', 404));
+        }
+        res.status(200).send({
+            status: 'success',
+            data: {
+                group,
+            },
+        });
+    },
+);

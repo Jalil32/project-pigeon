@@ -21,8 +21,10 @@ app.use(express_1.default.static(path_1.default.join(__dirname, 'my-app', 'build
 app.use('/', reactAppRoutes_1.default);
 app.use('/api/v1/user', userRoutes_1.default);
 app.use('/api/v1/group', groupRoutes_1.default);
-app.all('*', (req, res, next) => {
+app.all('*', (req, _res, next) => {
     next(new appError_1.default(`Can't find ${req.url} on this server!`, 404));
 });
+// GLOBAL ERROR HANDLER
+// This is called if any value is passed to next anywhere in the application
 app.use(errorController_1.default);
 module.exports = app;

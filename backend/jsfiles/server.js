@@ -7,16 +7,23 @@ const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config({ path: 'config.env' });
 const app_1 = __importDefault(require("./app"));
 const mongoose_1 = __importDefault(require("mongoose"));
+process.on('uncaughtException', (err) => {
+    console.log('UNCAUGHT EXCEPTION! Shutting down...');
+    console.log(err.name, err.message);
+    process.exit(1);
+});
 const port = process.env.PORT;
 const uri = process.env.URI;
-mongoose_1.default
-    .connect(uri, { dbName: 'project-pigeon' })
-    .then(() => {
+mongoose_1.default.connect(uri, { dbName: 'project-pigeon' }).then(() => {
     console.log('Successfully connected to database\n');
-})
-    .catch((err) => {
-    console.log('Failed to connect to database: ' + err);
 });
-app_1.default.listen(port, () => {
+const server = app_1.default.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
+});
+process.on('unhandledRejection', (err) => {
+    console.log('UNHANDLED REJECTION! Shutting down...');
+    console.log(err.name, err.message);
+    server.close(() => {
+        process.exit(1);
+    });
 });
