@@ -9,7 +9,7 @@ function LoginButton({ buttonText }: props) {
         'overflow-hidden group flex justify-center items-center relative  cursor-pointer'
     let otherStyles =
         styles +
-        ' relative text-[25px] text-sky-600 justify-center items-center rounded-2xl bg-stone-700 h-[65px] w-full flex flex-col '
+        ' relative text-[25px] text-sky-600 justify-center flex items-center rounded-2xl bg-stone-700 h-[65px] w-full flex flex-col '
 
     return (
         <Link to="/chat" className={otherStyles}>

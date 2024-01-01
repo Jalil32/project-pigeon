@@ -6,8 +6,8 @@ interface LoginProps {
 
 function LoginInput({ label, defaultText = '', type = 'text' }: LoginProps) {
     return (
-        <div className="relative rounded-2xl bg-stone-700 h-[65px] w-full flex flex-col border-0 border-transparent hover:border-sky-600 focus:bg-red-500">
-            <label className="text-stone-400 mt-2 ps-4 text-sm border-transparent">
+        <div className="relative rounded-2xl bg-stone-700 lg:h-[65px] md:h-[65px] h-[50px] w-full flex flex-col border-0 border-transparent hover:border-sky-600 focus:bg-red-500">
+            <label className="text-stone-400 mt-2 ps-4 lg:text-sm md:text-sm text-[10px] border-transparent">
                 {label}
             </label>
             <input
