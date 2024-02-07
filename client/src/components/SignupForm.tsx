@@ -1,16 +1,21 @@
 import LoginInput from './LoginInput'
 import { Form } from 'react-router-dom'
-
+import LoginButton from './LoginButton'
 function SignupForm() {
     return (
-        <Form method='post' className="md:space-y-8 lg:space-y-8 space-y-4">
+        <Form method="post" className="md:space-y-8 lg:space-y-8 space-y-4">
             <div className="flex md:space-x-8 lg:space-x-8 space-x-4">
-                <LoginInput label="First Name" />
-                <LoginInput label="Last Name" />
+                <LoginInput name="firstName" label="First Name" />
+                <LoginInput name="lastName" label="Last Name" />
             </div>
-            <LoginInput label="Email" />
-            <LoginInput label="Password" type="password" />{' '}
-            <LoginInput label="Password Confirm" type="password" />
+            <LoginInput name="email" label="Email" />
+            <LoginInput name="password" label="Password" type="password" />{' '}
+            <LoginInput
+                name="passwordConfirm"
+                label="Password Confirm"
+                type="password"
+            />
+            <LoginButton buttonText="Signup" type="submit" />
         </Form>
     )
 }

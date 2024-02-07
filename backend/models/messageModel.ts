@@ -1,4 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
+
 // Message Schema
 const messageSchema = new mongoose.Schema({
     sentFrom: {
@@ -7,7 +8,7 @@ const messageSchema = new mongoose.Schema({
         required: true,
     },
     content: { type: String, required: true },
-    timestamp: { type: Date, default: Date.UTC },
+    timestamp: { type: Date, default: Date.now },
     recipient: {
         required: true,
         type: Schema.Types.ObjectId,
@@ -20,9 +21,6 @@ const messageSchema = new mongoose.Schema({
     },
 });
 
-const Messages = mongoose.model(
-    'Messages',
-    messageSchema,
-);
+const Messages = mongoose.model('Messages', messageSchema);
 
 export = Messages;

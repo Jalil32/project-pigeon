@@ -1,10 +1,3 @@
-// Copyright 2015 The Gorilla WebSocket Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
-//go:build ignore
-// +build ignore
-
 package main
 
 import (
@@ -19,16 +12,18 @@ import (
 )
 
 type Message struct {
-	Message  string `json:"message"`
-	Sender   string `json:"sender"`
-	Receiver string `json:"receiver"`
+	Content   string   `json:"content"`
+	Recipient []string `json:"recipient"`
+	SentFrom  string   `json:"sentFrom"`
+	Timestamp int64    `json:"timestamp"`
+	Typing    bool     `json:"typing"`
+	GroupId   string   `json:"groupId"` // Group ID to identify the target group
 }
 
-// Create map to store connections
-type Connections struct {
-	mu sync.Mutex
-	//	cs []*websocket.Conn
-	m map[string]*websocket.Conn
+// Structure to manage group memberships and connections
+type GroupConnections struct {
+	mu     sync.Mutex
+	groups map[string]map[string]*websocket.Conn // groupID to (username to connection)
 }
 
 var addr = flag.String("addr", "localhost:8080", "http service address")
@@ -37,76 +32,83 @@ var upgrader = websocket.Upgrader{
 		return true
 	},
 } // use default options
-var connections Connections = Connections{m: make(map[string]*websocket.Conn)}
 
-func newConnection(c *websocket.Conn, username string) {
+// Global variable to manage connections
+var groupConnections = GroupConnections{
+	groups: make(map[string]map[string]*websocket.Conn),
+}
 
-	// Store connection
-	connections.mu.Lock()
-	connections.m[username] = c
-	connections.mu.Unlock()
+func newConnection(c *websocket.Conn, username string, groupId string) {
+	// Store connection in the appropriate group
+	groupConnections.mu.Lock()
+	if _, ok := groupConnections.groups[groupId]; !ok {
+		groupConnections.groups[groupId] = make(map[string]*websocket.Conn)
+	}
+	groupConnections.groups[groupId][username] = c
+	groupConnections.mu.Unlock()
 
 	for {
 		_, message, err := c.ReadMessage()
 
-		fmt.Println(message)
-
 		if err != nil {
-			log.Println(err)
-			// remove connection form connections
-			delete(connections.m, username)
+			log.Println("read error:", err)
+			// Remove connection from group
+			groupConnections.mu.Lock()
+			delete(groupConnections.groups[groupId], username)
+			if len(groupConnections.groups[groupId]) == 0 {
+				delete(groupConnections.groups, groupId) // Clean up if no more users in the group
+			}
+			groupConnections.mu.Unlock()
 			return
 		}
 
 		var msg Message
-		err = json.Unmarshal(message, &msg)
-		if err != nil {
-			log.Println(err)
+		if err := json.Unmarshal(message, &msg); err != nil {
+			log.Println("unmarshal error:", err)
+			continue
 		}
 
-		fmt.Println(msg)
-
-		// add message to database
-		fmt.Println(connections.m)
-
-		// send messages to everyone in that group
-		for _, value := range connections.m {
-			if err := value.WriteMessage(websocket.TextMessage, []byte(msg.Message)); err != nil {
-				log.Println(err)
-				return
-			}
-
-		}
-
-		// is connection closed remove connection from connections
-
+		broadcastMessageToGroup(groupId, msg, message)
 	}
+}
 
+func broadcastMessageToGroup(groupId string, msg Message, rawMessage []byte) {
+	groupConnections.mu.Lock()
+	defer groupConnections.mu.Unlock()
+
+	for username, conn := range groupConnections.groups[groupId] {
+		if username != msg.SentFrom { // Skip the sender
+			if err := conn.WriteMessage(websocket.TextMessage, rawMessage); err != nil {
+				log.Println("write error:", err)
+			}
+		}
+	}
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	username := r.URL.Query().Get("username")
+	groupId := r.URL.Query().Get("groupId") // Assume groupId is passed as a query parameter
 
-	fmt.Println(username)
+	fmt.Println(r.URL.String())
+	if groupId == "" {
+		log.Println("groupId must be provided")
+		http.Error(w, "groupId must be provided", http.StatusBadRequest)
+		return
+	}
+
+	fmt.Println("User", username, "connected to group", groupId)
 	c, err := upgrader.Upgrade(w, r, nil)
-
 	if err != nil {
 		log.Print("upgrade:", err)
 		return
 	}
 
-	go newConnection(c, username)
-
-}
-
-func home(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "index.html")
+	go newConnection(c, username, groupId)
 }
 
 func main() {
 	flag.Parse()
 	log.SetFlags(0)
 	http.HandleFunc("/ws", handler)
-	http.HandleFunc("/", home)
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }

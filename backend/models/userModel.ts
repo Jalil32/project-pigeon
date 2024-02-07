@@ -5,9 +5,13 @@ import IUser from './../types/IUser';
 import crypto from 'crypto';
 
 const userSchema = new Schema<IUser>({
-    name: {
+    firstName: {
         type: String,
-        required: [true, 'Please provide your name'],
+        required: [true, 'Please provide your first name'],
+    },
+    lastName: {
+        type: String,
+        required: [true, 'Please provide your last name'],
     },
     email: {
         type: String,
@@ -43,6 +47,12 @@ const userSchema = new Schema<IUser>({
         {
             type: Schema.Types.ObjectId,
             ref: 'Groups',
+        },
+    ],
+    workspaces: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Workspaces',
         },
     ],
     passwordChangedAt: Date,

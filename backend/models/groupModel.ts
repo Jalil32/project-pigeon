@@ -5,12 +5,16 @@ const groupSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, 'A group must have a name'],
-        unique: [true, 'A group with this name already exists.'],
     },
     creator: {
         type: Schema.Types.ObjectId,
         ref: 'Users',
         required: [true, 'A group must have a creator'],
+    },
+    workspace: {
+        type: Schema.Types.ObjectId,
+        ref: 'Users',
+        required: [true, 'A group must be apart of a workspace'],
     },
     members: [
         {

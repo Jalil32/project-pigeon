@@ -7,6 +7,7 @@ import {
     deleteUser,
     updateMe,
     deleteMe,
+    getGroupsUsers,
 } from './../controllers/userController';
 import {
     signup,
@@ -15,6 +16,7 @@ import {
     resetPassword,
     protect,
     updatePassword,
+    validateUser,
 } from '../controllers/authController';
 
 const router = express.Router();
@@ -29,7 +31,11 @@ router.patch('/updateMyPassword', protect, updatePassword);
 router.patch('/updateMe', protect, updateMe);
 router.delete('/deleteMe', protect, deleteMe);
 
+router.get('/validateUser', protect, validateUser);
+
 router.route('/').get(getAllUsers).post(createUser);
-router.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);
+router.route('/:id').get(protect, getUser).patch(updateUser).delete(deleteUser);
+
+router.route('/group/:id').get(protect, getGroupsUsers);
 
 export = router;

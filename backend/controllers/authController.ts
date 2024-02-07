@@ -1,4 +1,4 @@
-import { NextFunction } from 'express';
+import { CookieOptions, NextFunction } from 'express';
 import { ObjectId } from 'mongodb';
 import User from './../models/userModel';
 import { Response, Request } from 'express';
@@ -18,13 +18,15 @@ const signToken = (id: ObjectId) => {
 
 const createSendToken = (user: IUser, statusCode: number, res: Response) => {
     const token = signToken(user._id);
-    const cookieOptions = {
+    const cookieOptions: CookieOptions = {
         expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+        sameSite: 'lax',
         httpOnly: true,
         secure: false,
     };
 
     if (process.env.NODE_ENV === 'production') {
+        // REMEMBER TO CHANGE THIS BACK TO TRUE
         cookieOptions.secure = true;
     }
 
@@ -43,7 +45,8 @@ const createSendToken = (user: IUser, statusCode: number, res: Response) => {
 
 export const signup = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const newUser = await User.create({
-        name: req.body.name,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
         email: req.body.email,
         role: req.body.role,
         password: req.body.password,
@@ -90,6 +93,8 @@ export const protect = catchAsync(async (req: CustomRequest, res: Response, next
     let token: string | undefined;
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         token = req.headers.authorization.split(' ')[1];
+    } else if (req.cookies.jwt) {
+        token = req.cookies.jwt;
     }
 
     if (!token) {
@@ -114,6 +119,15 @@ export const protect = catchAsync(async (req: CustomRequest, res: Response, next
     req.user = currentUser;
     next();
 });
+
+export const validateUser = catchAsync(
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        res.status(200).json({
+            status: 'success',
+            message: 'You are logged in!',
+        });
+    },
+);
 
 export const restrictTo = (...roles: any) => {
     return (req: CustomRequest, res: Response, next: NextFunction) => {

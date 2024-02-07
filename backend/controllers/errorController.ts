@@ -44,19 +44,39 @@ const handleCastErrorDB = (err: CustomError): CustomError => {
 
 const handleDuplicateFieldsDB = (err: CustomError): CustomError => {
     let value;
+
     if (err.errmsg) {
         value = err.errmsg.match(/(["'])(\\?.)*?\1/) ?? [undefined];
+        console.log(value);
         value = value[0];
     }
 
-    const message = `Duplicate field value ${value}. Please use another value!`;
+    const type = err.errmsg ?? undefined;
+
+    let message = `Duplicate field value ${value}. Please use another value!`;
+
+    if (type && type.includes('email')) {
+        message = 'Account with this email already exists. Please login.';
+    }
+
     return new AppError(message, 400);
 };
 
 const handleValidationErrorDB = (err: any): CustomError => {
     console.log('ValidationError');
     const errors = Object.values(err.errors).map((el: any) => el.message);
-    const message = `Invalid input data. ${errors.join('. ')}`;
+    console.log(errors);
+    let message = `${errors.join('. ')}.`;
+
+    // Check if password error
+    if (message.includes('minimum allowed length')) {
+        message = 'Invalid password. Password must be at least 8 characters long.';
+    }
+
+    if (message.includes('passwordConfirm')) {
+        message = 'Passwords do not match.';
+    }
+
     return new AppError(message, 400);
 };
 

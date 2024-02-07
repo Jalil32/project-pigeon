@@ -4,6 +4,7 @@ import Users from './../models/userModel';
 import catchAsync from './../utils/catchAsync';
 import AppError from '../utils/appError';
 import APIFeatures from './../utils/apiFeatures';
+import Workspaces from '../models/workspaceModel';
 
 export const getAllGroups = catchAsync(async (_req: Request, res: Response) => {
     const groups = await Groups.find();
@@ -39,10 +40,7 @@ export const addGroupMember = catchAsync(
         );
 
         // 4) Add group to user
-        await Users.updateOne(
-            { _id: req.body._id },
-            { $push: { groups: req.params.id } },
-        );
+        await Users.updateOne({ _id: req.body._id }, { $push: { groups: req.params.id } });
 
         res.status(200).send({
             status: 'success',
@@ -59,10 +57,43 @@ export const createGroup = catchAsync(async (req: Request, res: Response) => {
 
     console.log('Created group: \n' + group);
 
-    await Users.updateMany(
-        { _id: { $in: group.members } },
-        { $push: { groups: group._id } },
-    );
+    // add group to members
+    for (let member of group.members) {
+        await Users.updateOne({ _id: member }, { $push: { groups: group._id } });
+    }
+
+    await Workspaces.updateOne({ _id: req.body.workspace }, { $push: { groups: group._id } });
+
+    // Only need this if were adding members via this request
+    // await Users.updateMany({ _id: { $in: group.members } }, { $push: { groups: group._id } });
+
+    res.status(201).send({
+        status: 'success',
+        data: {
+            group,
+        },
+    });
+});
+
+export const deleteGroup = catchAsync(async (req: Request, res: Response): Promise<void> => {
+    const group = await Groups.findByIdAndDelete(req.params.id, {
+        returnDocument: 'before',
+    });
+
+    console.log('group deleted: ' + group);
+    if (group) {
+        await Users.updateMany(
+            {
+                groups: {
+                    $elemMatch: {
+                        $eq: group._id,
+                    },
+                },
+            },
+            { $pull: { groups: group._id } },
+        );
+        console.log('users updated');
+    }
 
     res.status(200).send({
         status: 'success',
@@ -72,48 +103,14 @@ export const createGroup = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-export const deleteGroup = catchAsync(
-    async (req: Request, res: Response): Promise<void> => {
-        const group = await Groups.findByIdAndDelete(req.params.id, {
-            returnDocument: 'before',
-        });
+export const getGroup = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const group = await Groups.findById(req.params.id);
 
-        console.log('group deleted: ' + group);
-        if (group) {
-            await Users.updateMany(
-                {
-                    groups: {
-                        $elemMatch: {
-                            $eq: group._id,
-                        },
-                    },
-                },
-                { $pull: { groups: group._id } },
-            );
-            console.log('users updated');
-        }
-
-        res.status(200).send({
-            status: 'success',
-            data: {
-                group,
-            },
-        });
-    },
-);
-
-export const getGroup = catchAsync(
-    async (req: Request, res: Response, next: NextFunction) => {
-        const group = await Groups.findById(req.params.id);
-
-        if (!group) {
-            return next(new AppError('No tour found with that ID', 404));
-        }
-        res.status(200).send({
-            status: 'success',
-            data: {
-                group,
-            },
-        });
-    },
-);
+    if (!group) {
+        return next(new AppError('No group found with that ID', 404));
+    }
+    res.status(200).send({
+        status: 'success',
+        group,
+    });
+});

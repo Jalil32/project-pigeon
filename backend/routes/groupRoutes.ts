@@ -10,7 +10,7 @@ import { protect, restrictTo } from './../controllers/authController';
 
 const router = express.Router();
 
-router.route('/').get(protect, getAllGroups).post(createGroup);
+router.route('/').get(protect, getAllGroups).post(protect, createGroup);
 
 router
     .route('/:id')
