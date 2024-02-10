@@ -62,13 +62,10 @@ const useMembers = (teamId: string) => {
         const fetchMembers = async () => {
             try {
                 const response = await axios.get(`/api/v1/user/group/${teamId}`)
-                let membersObj = response.data.users.reduce(
-                    (acc: { [key: string]: Member }, member: Member) => {
-                        acc[member._id] = member
-                        return acc
-                    },
-                    {}
-                )
+                let membersObj = response.data.users.reduce((acc: { [key: string]: Member }, member: Member) => {
+                    acc[member._id] = member
+                    return acc
+                }, {})
 
                 console.log('members:', membersObj)
                 setMembers(membersObj)
@@ -99,9 +96,7 @@ function Chat({ groups }: props) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(
-                    `/api/v1/message/${params.teamId}`
-                )
+                const response = await axios.get(`/api/v1/message/${params.teamId}`)
                 setMessages(response.data.data.messages)
             } catch (error) {
                 console.error('Error fetching messages:', error)
@@ -122,7 +117,7 @@ function Chat({ groups }: props) {
     }
 
     return (
-        <div className="h-screen flex flex-grow flex-col justify-between">
+        <div className="h-screen flex flex-col justify-between w-[80%]">
             <div className="flex p-5 justify-between items-center flex-row	rounded-2xl m-6 bg-stone-800 text-[35px] text-slate-400">
                 <div className="">{group?.name}</div>
                 <button className="space-x-4">
@@ -137,21 +132,16 @@ function Chat({ groups }: props) {
             )}
             <div
                 ref={messagesContainerRef}
-                className="flex flex-col w-full flex-grow p-5 text-slate-300 space-y-4 overflow-y-auto overflow-visible"
+                className="flex flex-col flex-grow p-5 text-slate-300 space-y-4 overflow-y-auto overflow-visible"
             >
                 {messages.map((message) => (
                     <div
                         key={message.timestamp}
-                        className={`flex w-full ${
-                            message.sentFrom === currentUserID
-                                ? 'justify-end'
-                                : 'justify-start'
-                        }`}
+                        className={`flex ${message.sentFrom === currentUserID ? 'justify-end' : 'justify-start'}`}
                     >
-                        <div className={`flex flex-col max-w-1/2`}>
-                            <div className="text-sky-900 ml-3 mr-3 text-[16px] font-semibold">
-                                {members[message.sentFrom]?.firstName ||
-                                    'error'}
+                        <div className={`flex flex-col max-w-[60%]`}>
+                            <div className={`text-sky-900 ml-3 mr-3 text-[16px] font-semibold items-end justify-start`}>
+                                {members[message.sentFrom]?.firstName || 'error'}
                             </div>
                             <div className="p-3 h-auto bg-stone-800 rounded-2xl">
                                 <div>{message.content}</div>

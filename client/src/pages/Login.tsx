@@ -1,15 +1,7 @@
 import SignupForm from '../components/SignupForm'
-import LoginButton from '../components/LoginButton'
-import {
-    Form,
-    Link,
-    redirect,
-    useActionData,
-    useSearchParams,
-} from 'react-router-dom'
+import { Link, redirect, useActionData, useSearchParams } from 'react-router-dom'
 import LoginForm from '../components/LoginForm'
 import { json } from 'react-router-dom'
-import { on } from 'events'
 
 interface authData {
     email: string
@@ -31,9 +23,7 @@ function LoginPage() {
     return (
         <div className="bg-gradient-to-tr from-green-400 to-cyan-600 flex w-screen h-screen items-center justify-center">
             <div className=" md:space-y-8 lg:space-y-8 space-y-4 text-slate-300 leading-none font-noto font-bold p-14 shadow-2xl lg:rounded-[55px] sm:rounded-[55px] rounded-t-[55px] bg-stone-800 h-auto self-end md:self-center sm:min-h-[850px] lg:w-[550px] sm:w-[550px] w-full">
-                <div className="lg:text-[35px] md:text-[30px] sm:text-[30px] text-stone-400">
-                    Pigeon
-                </div>
+                <div className="lg:text-[35px] md:text-[30px] sm:text-[30px] text-stone-400">Pigeon</div>
                 {isLogin && (
                     <div className="lg:text-[60px] md:text-[40px] sm:text-[20px] ">
                         Enter <br /> Your Details
@@ -47,9 +37,7 @@ function LoginPage() {
                 <div className=" text-stone-400 lg:text-[20px] md:text-[15px]">
                     {isLogin ? 'Dont have an account? ' : 'Already a member? '}
                     <Link
-                        to={`?mode=${isLogin ? 'signup' : 'login'}${
-                            isInvite ? '&inviteToken=' + token : ''
-                        }`}
+                        to={`?mode=${isLogin ? 'signup' : 'login'}${isInvite ? '&inviteToken=' + token : ''}`}
                         className="text-sky-600 "
                     >
                         {isLogin ? 'Sign up' : 'Log in'}
@@ -118,18 +106,15 @@ export async function action({ request }: any) {
 
     if (isInvite) {
         // tell node rest api to add him to the workspace
-        const workspaceResponse: any = await fetch(
-            `/api/v1/workspace/${user._id}`,
-            {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    token: inviteToken,
-                }),
-            }
-        )
+        const workspaceResponse: any = await fetch(`/api/v1/workspace/${user._id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                token: inviteToken,
+            }),
+        })
 
         const workspaceData = await workspaceResponse.json()
 
