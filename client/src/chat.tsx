@@ -1,11 +1,15 @@
-import React, { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect } from 'react'
+import Avatar from '@mui/material/Avatar'
 import axios from 'axios'
 import { useParams } from 'react-router-dom'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
 import SettingsIcon from '@mui/icons-material/Settings'
 import { SendMessage } from './components/SendMessage'
-import { Circle, Crop75, Settings } from '@mui/icons-material'
-import CircleIcon from '@mui/icons-material/Circle'
+import { Circle } from '@mui/icons-material'
+import {  deepPurple } from '@mui/material/colors'
+import Message from './components/Message'
+
+
 interface Group {
     _id: string
     name: string
@@ -16,43 +20,12 @@ interface Member {
     firstName: string
 }
 
-interface Message {
+interface MessageType {
     sentFrom: string
     content: string
     timestamp: number
     recipient: string
     groupId: string
-}
-
-const useGroup = (teamId: string) => {
-    const [group, setGroup] = useState<Group | null>(null)
-
-    useEffect(() => {
-        const groups = JSON.parse(localStorage.getItem('groups') || '[]')
-        const foundGroup = groups.find((g: Group) => g._id === teamId)
-        console.log('groupId', foundGroup)
-        setGroup(foundGroup)
-    }, [teamId])
-
-    return group
-}
-
-const useMessages = (teamId: string) => {
-    const [messages, setMessages] = useState<Message[]>([])
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get(`/api/v1/message/${teamId}`)
-                setMessages(response.data.data.messages)
-            } catch (error) {
-                console.error('Error fetching messages:', error)
-            }
-        }
-        fetchData()
-    }, [teamId])
-
-    return messages
 }
 
 const useMembers = (teamId: string) => {
@@ -88,9 +61,9 @@ function Chat({ groups }: props) {
     const currentUserID = JSON.parse(localStorage.getItem('user') || '{}')._id
     const group = groups.find((g: Group) => g._id === params.teamId)
     const members = useMembers(params.teamId as string)
-    const [isTyping, setIsTyping] = useState(false)
     const messagesContainerRef = useRef<HTMLDivElement>(null)
-    const [messages, setMessages] = useState<Message[]>([])
+    const [messages, setMessages] = useState<MessageType[]>([])
+	const [isTyping, setIsTyping] = useState(false)
     const [typingName, setTypingName] = useState<string>('')
 
     useEffect(() => {
@@ -112,7 +85,7 @@ function Chat({ groups }: props) {
         }
     }, [messages, isTyping])
 
-    const addMessage = (newMessage: Message) => {
+    const addMessage = (newMessage: MessageType) => {
         setMessages((prevMessages) => [...prevMessages, newMessage])
     }
 
@@ -135,23 +108,8 @@ function Chat({ groups }: props) {
                 className="flex flex-col flex-grow p-5 text-slate-300 space-y-4 overflow-y-auto overflow-visible"
             >
                 {messages.map((message) => (
-                    <div
-                        key={message.timestamp}
-                        className={`flex ${message.sentFrom === currentUserID ? 'justify-end' : 'justify-start'}`}
-                    >
-                        <div className={`flex flex-col max-w-[60%]`}>
-                            <div className={`text-sky-900 ml-3 mr-3 text-[16px] font-semibold items-end justify-start`}>
-                                {members[message.sentFrom]?.firstName || 'error'}
-                            </div>
-                            <div className="p-3 h-auto bg-stone-800 rounded-2xl">
-                                <div>{message.content}</div>
-                            </div>
-                            <div className="ml-3 font-semibold text-stone-600 text-[12px]">
-                                {new Date(message.timestamp).toLocaleString()}
-                            </div>
-                        </div>
-                    </div>
-                ))}
+					<Message message={message} currentUserId={currentUserID} members={members}/>
+               ))}
                 {isTyping && typingName && (
                     <div>
                         <div className="text-sky-900 ml-3 mr-3 text-[16px] font-semibold">

@@ -101,6 +101,7 @@ userSchema.methods.correctPassword = async function (
 // Instance methods
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp: number) {
     if (this.passwordChangedAt) {
+        console.log("comparing passwordChangedAt:", this.passwordChangedAt.getTime() / 1000, "and JWTTimestamp", JWTTimestamp)
         const changedTimestamp: number = this.passwordChangedAt.getTime() / 1000;
         return JWTTimestamp < changedTimestamp;
     }

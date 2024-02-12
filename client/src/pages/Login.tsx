@@ -56,7 +56,7 @@ export default LoginPage
 
 export async function action({ request }: any) {
     const searchParams = new URL(request.url).searchParams
-    const mode = searchParams.get('mode') || 'login'
+    const mode = searchParams.get('mode') || 'signup'
     const isInvite = searchParams.get('inviteToken') !== null
     const inviteToken = searchParams.get('inviteToken')
 

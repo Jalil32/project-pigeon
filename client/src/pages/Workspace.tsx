@@ -71,7 +71,7 @@ function Workspace() {
 
     return (
         <div className=" bg-gradient-to-tr from-green-400 to-cyan-600  flex w-screen h-screen">
-            <div className="select-none  text-slate-300 leading-none font-noto font-bold p-14 shadow-2xl flex flex-col bg-stone-800 h-full w-1/4">
+            <div className="select-none  text-slate-300 leading-none font-noto font-bold p-14 shadow-2xl flex flex-col bg-stone-800 h-full w:1/4 sm:w-1/2 ">
                 <WorkspaceSelection
                     activeWorkspace={activeWorkspace}
                     workspaces={workspaces}

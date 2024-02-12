@@ -34,6 +34,8 @@ const createSendToken = (user: IUser, statusCode: number, res: Response) => {
 
     user.password = undefined;
 
+    console.log('sending token');
+
     res.status(statusCode).json({
         status: 'success',
         token,
