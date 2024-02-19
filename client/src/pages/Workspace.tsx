@@ -9,6 +9,8 @@ import DirectChatSelection from '../components/DirectChatSelection'
 import GlobalSettings from '../components/GlobalSettings'
 import { WorkspaceType } from '../types'
 
+import Popup from 'reactjs-popup'
+
 function Workspace() {
     const navigate = useNavigate()
     const params = useParams()
@@ -71,7 +73,7 @@ function Workspace() {
 
     return (
         <div className=" bg-gradient-to-tr from-green-400 to-cyan-600  flex w-screen h-screen">
-            <div className="select-none  text-slate-300 leading-none font-noto font-bold p-14 shadow-2xl flex flex-col bg-stone-800 h-full w:1/4 sm:w-1/2 ">
+            <div className="select-none  text-slate-300 leading-none font-noto font-bold p-8 shadow-2xl flex flex-col bg-stone-800 h-full  w-[400px]">
                 <WorkspaceSelection
                     activeWorkspace={activeWorkspace}
                     workspaces={workspaces}

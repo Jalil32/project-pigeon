@@ -1,29 +1,17 @@
-import { ReactNode, useEffect, useState } from 'react'
-import IconButton from '@mui/material/IconButton'
-import Avatar from '@mui/material/Avatar'
-import { deepOrange, deepPurple } from '@mui/material/colors'
-import Menu from '@mui/material/Menu'
-import MenuItem from '@mui/material/MenuItem'
-import MoreVertIcon from '@mui/icons-material/MoreVert'
-import { createTheme } from '@mui/material'
-import Chat from '../chat'
+import { useState } from 'react'
 import { WorkspaceType } from '../types'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import Popup from 'reactjs-popup'
+import CreateWorkspace from './CreateWorkspace'
 
 const ITEM_HEIGHT = 48
 
 interface Props {
     activeWorkspace: WorkspaceType | undefined // Assuming activeWorkspace might not be set initially
     workspaces: WorkspaceType[]
-    setActiveWorkspace: React.Dispatch<
-        React.SetStateAction<WorkspaceType | undefined>
-    > // Updated type for useState setter
+    setActiveWorkspace: React.Dispatch<React.SetStateAction<WorkspaceType | undefined>> // Updated type for useState setter
 }
-export default function WorkspaceSelection({
-    setActiveWorkspace,
-    activeWorkspace,
-    workspaces,
-}: Props) {
+export default function WorkspaceSelection({ setActiveWorkspace, activeWorkspace, workspaces }: Props) {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
     const open = Boolean(anchorEl)
     const navigate = useNavigate()
@@ -40,56 +28,58 @@ export default function WorkspaceSelection({
         navigate(`/workspace/${workspace._id}`)
     }
 
+    const [isOpen, setIsOpen] = useState(false)
     return (
         <>
-            <div className="flex flex-row text-[30px] text-stone-400 mb-6 items-center justify-between">
-                <div className="self-center justify-self-center pb-1">
-                    {activeWorkspace === undefined ? '' : activeWorkspace?.name}
-                </div>
-                <IconButton
-                    aria-label="more"
-                    id="long-button"
-                    aria-controls={open ? 'long-menu' : undefined}
-                    aria-expanded={open ? 'true' : undefined}
-                    aria-haspopup="true"
-                    onClick={handleClick}
-                >
-                    <MoreVertIcon sx={{ color: '#A8A29E' }} />
-                </IconButton>
-                <Menu
-                    id="long-menu"
-                    MenuListProps={{
-                        'aria-labelledby': 'long-button',
-                    }}
-                    anchorEl={anchorEl}
-                    open={open}
-                    onClose={handleClose}
-                    PaperProps={{
-                        style: {
-                            maxHeight: ITEM_HEIGHT * 4.5,
-                            width: '20ch',
-                        },
-                    }}
-                >
-                    {workspaces.map((workspace: any) => {
-                        if (workspace.name !== activeWorkspace?.name) {
-                            return (
-                                <MenuItem key={workspace._id}>
-                                    <button
-                                        onClick={() =>
-                                            selectWorkspace(workspace)
+            <div className=" flex flex-row text-[30px] text-stone-400 mb-6 items-center justify-center">
+                <div className="relative inline-block  w-full">
+                    <button
+                        onClick={() => setIsOpen(!isOpen)}
+                        className="hover:bg-stone-900 rounded-2xl p-4 items-center justify-center inline-flex w-full focus-visible:ring-opacity-75"
+                    >
+                        {activeWorkspace === undefined ? '' : activeWorkspace?.name}
+                    </button>
+
+                    <div
+                        className={`w-full origin-top absolute left-1/2 -translate-x-1/2 mt-2 transform transition ease-out duration-300 ${
+                            isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
+                        }`}
+                        style={{ transformOrigin: 'center center' }}
+                    >
+                        <div className="overflow-hidden rounded-lg shadow shadow-stone-950 ring-1 ring-black ring-opacity-5">
+                            <div className="items-start bg-[#292221] p-1 hex flex-col">
+                                {workspaces.map((workspace: WorkspaceType) => {
+                                    return (
+                                        <button
+                                            onClick={() => selectWorkspace(workspace)}
+                                            className="text-start rounded-lg block p-2 text-[20px] text-white hover:bg-stone-900 w-full"
+                                        >
+                                            <div className="pl-1">
+                                                {workspace.name +
+                                                    (activeWorkspace?.name === workspace.name ? ' -' : '')}
+                                            </div>
+                                            <div className="text-[16px] p-1 text-stone-400">4 members</div>
+                                        </button>
+                                    )
+                                })}
+                                <div className="w-full border-t-2 font-normal border-stone-400 mt-2">
+                                    <Popup
+                                        trigger={
+                                            <button className="w-full text-left mt-2 text-[20px] hover:bg-stone-900 rounded-lg p-2">
+                                                + Create a new workspace
+                                            </button>
                                         }
+                                        modal
+                                        nested
+                                        position="center center"
                                     >
-                                        {workspace.name}
-                                    </button>
-                                </MenuItem>
-                            )
-                        }
-                    })}
-                    <MenuItem key={'create'}>
-                        <button>+ create workspace</button>
-                    </MenuItem>
-                </Menu>
+                                        {((close: any) => <CreateWorkspace />) as unknown as React.ReactNode}
+                                    </Popup>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </>
     )

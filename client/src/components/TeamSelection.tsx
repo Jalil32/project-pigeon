@@ -54,9 +54,7 @@ function TeamSelection({ setGroups, groups, activeWorkspace }: Props) {
                                 <NavLink
                                     to={`${params.workspaceId}/team/${group._id}`}
                                     className={({ isActive }) =>
-                                        isActive
-                                            ? 'text-sky-400 pl-3'
-                                            : 'text-slate-300 hover:text-slate-400'
+                                        isActive ? 'text-sky-400 pl-3' : 'text-slate-300 hover:text-slate-400'
                                     }
                                 >
                                     {group.name}{' '}
@@ -67,11 +65,7 @@ function TeamSelection({ setGroups, groups, activeWorkspace }: Props) {
                 </ul>
 
                 <Popup
-                    trigger={
-                        <button className="hover:text-slate-400 mb-8 w-fit">
-                            + Create Team
-                        </button>
-                    }
+                    trigger={<button className="hover:text-slate-400 mb-8 w-fit">+ Create Team</button>}
                     modal
                     nested
                     position="center center"

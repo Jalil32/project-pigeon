@@ -6,9 +6,8 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd'
 import SettingsIcon from '@mui/icons-material/Settings'
 import { SendMessage } from './components/SendMessage'
 import { Circle } from '@mui/icons-material'
-import {  deepPurple } from '@mui/material/colors'
+import { deepPurple } from '@mui/material/colors'
 import Message from './components/Message'
-
 
 interface Group {
     _id: string
@@ -63,7 +62,7 @@ function Chat({ groups }: props) {
     const members = useMembers(params.teamId as string)
     const messagesContainerRef = useRef<HTMLDivElement>(null)
     const [messages, setMessages] = useState<MessageType[]>([])
-	const [isTyping, setIsTyping] = useState(false)
+    const [isTyping, setIsTyping] = useState(false)
     const [typingName, setTypingName] = useState<string>('')
 
     useEffect(() => {
@@ -90,7 +89,7 @@ function Chat({ groups }: props) {
     }
 
     return (
-        <div className="h-screen flex flex-col justify-between w-[80%]">
+        <div className="h-screen flex flex-col justify-between flex-grow">
             <div className="flex p-5 justify-between items-center flex-row	rounded-2xl m-6 bg-stone-800 text-[35px] text-slate-400">
                 <div className="">{group?.name}</div>
                 <button className="space-x-4">
@@ -108,8 +107,8 @@ function Chat({ groups }: props) {
                 className="flex flex-col flex-grow p-5 text-slate-300 space-y-4 overflow-y-auto overflow-visible"
             >
                 {messages.map((message) => (
-					<Message message={message} currentUserId={currentUserID} members={members}/>
-               ))}
+                    <Message message={message} currentUserId={currentUserID} members={members} />
+                ))}
                 {isTyping && typingName && (
                     <div>
                         <div className="text-sky-900 ml-3 mr-3 text-[16px] font-semibold">
