@@ -8,9 +8,6 @@ export const createMessage = catchAsync(async (req: Request, res: Response) => {
     const message = await Messages.create(req.body);
     console.log('Message created: \n' + message);
 
-    // 2) Add message to the messages group
-    await Groups.findByIdAndUpdate({ _id: req.body.recipient }, { $push: { messages: message } });
-
     // 3) Return response
     res.status(201).send({
         status: 'success',

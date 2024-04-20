@@ -31,7 +31,7 @@ export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const getGroupsUsers = catchAsync(async (req: Request, res: Response) => {
-    const users = await Users.find({ groups: req.params.id });
+    const users = await Users.find({ workspaces: req.params.id });
 
     res.status(200).send({
         status: 'success',
@@ -40,12 +40,10 @@ export const getGroupsUsers = catchAsync(async (req: Request, res: Response) => 
 });
 
 export const getUser = catchAsync(async (req: Request, res: Response) => {
-    console.log(req.params.id);
     const user = await Users.findById(req.params.id);
-    console.log(user);
     res.status(200).send({
         status: 'success',
-        user: user,
+        user,
     });
 });
 

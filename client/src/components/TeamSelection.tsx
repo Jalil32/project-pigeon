@@ -65,7 +65,7 @@ function TeamSelection({ setGroups, groups, activeWorkspace }: Props) {
                 </ul>
 
                 <Popup
-                    trigger={<button className="hover:text-slate-400 mb-8 w-fit">+ Create Team</button>}
+                    trigger={<button className="text-[20px] hover:text-slate-400 mb-8 w-fit">+ Create Team</button>}
                     modal
                     nested
                     position="center center"

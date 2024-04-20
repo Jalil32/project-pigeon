@@ -2,6 +2,7 @@ import SignupForm from '../components/SignupForm'
 import { Link, redirect, useActionData, useSearchParams } from 'react-router-dom'
 import LoginForm from '../components/LoginForm'
 import { json } from 'react-router-dom'
+import axios from 'axios'
 
 interface authData {
     email: string
@@ -101,28 +102,19 @@ export async function action({ request }: any) {
     const resData = await response.json()
     const user = resData.data.user
 
+    console.log(user)
+
     // store user in browser storage for now
     localStorage.setItem('user', JSON.stringify(user))
 
     if (isInvite) {
         // tell node rest api to add him to the workspace
-        const workspaceResponse: any = await fetch(`/api/v1/workspace/${user._id}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                token: inviteToken,
-            }),
+        const workspaceResponse = await axios.patch(`/api/v1/workspace/${user._id}`, {
+            token: inviteToken,
         })
 
-        const workspaceData = await workspaceResponse.json()
-
-        console.log(workspaceData)
-
-        // redirect to the new workspace
-        redirect(`/workspace/${workspaceData.data.workspaceId}`)
+        console.log(workspaceResponse)
     }
 
-    return redirect('/workspace')
+    return redirect('/')
 }

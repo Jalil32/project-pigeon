@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { KeyboardEvent, ChangeEventHandler, useEffect, useState } from 'react'
 import { ChangeEvent, Dispatch, SetStateAction, useRef } from 'react'
 import { useParams } from 'react-router-dom'
@@ -6,8 +7,8 @@ interface Message {
     sentFrom: string
     content: string
     timestamp: number
-    recipient: string[] // Assuming recipient should be an array based on server-side code
-    groupId: string
+    recipient: string // Assuming recipient should be an array based on server-side code
+    onModel: string
 }
 
 interface SendMessageProps {
@@ -37,14 +38,14 @@ export function SendMessage({ onSendMessage, group, setIsTyping, setTypingName }
             ws.onmessage = (e) => {
                 const msg = JSON.parse(e.data)
 
-                if (msg.typing && msg.groupId === params.teamId) {
+                if (msg.typing && msg.recipient === params.teamId) {
                     setIsTyping(true)
                     setTypingName(msg.sentFrom)
                     if (typingTimeoutRef.current) {
                         clearTimeout(typingTimeoutRef.current)
                     }
                     typingTimeoutRef.current = setTimeout(() => setIsTyping(false), 10000)
-                } else if (msg.groupId === params.teamId) {
+                } else if (msg.recipient === params.teamId) {
                     setIsTyping(false)
                     const msgBody: Message = JSON.parse(e.data)
                     onSendMessage(msgBody)
@@ -71,22 +72,31 @@ export function SendMessage({ onSendMessage, group, setIsTyping, setTypingName }
         }
     }
 
-    const sendMessage = () => {
+    const sendMessage = async () => {
         if (!ws) {
             console.error('WebSocket is not connected.')
             return
         }
 
         const msgBody: Message = {
+            sentFrom: currentUserID,
             content: message,
-            recipient: group.members, // Assuming this is correctly an array
-            sentFrom: JSON.parse(localStorage.getItem('user') as string)._id,
             timestamp: Date.now(),
-            groupId: group._id,
+            recipient: group._id,
+            onModel: 'Groups',
         }
+
+        console.log(msgBody)
+
+        const response = await axios.post('/api/v1/message', msgBody)
+        console.log(response)
+
         onSendMessage(msgBody) // Assuming you want to do something with this on the parent component
 
         ws.send(JSON.stringify(msgBody))
+
+        // send message to node api to store it
+
         setMessage('') // Clear message input after sending
     }
 
@@ -95,7 +105,7 @@ export function SendMessage({ onSendMessage, group, setIsTyping, setTypingName }
         setMessage(e.target.value)
     }
 
-    function handleTyping() {
+    async function handleTyping() {
         if (!ws) {
             console.log('WS disconnected')
             return
@@ -103,16 +113,16 @@ export function SendMessage({ onSendMessage, group, setIsTyping, setTypingName }
         const typingMessage = {
             typing: true,
             sentFrom: currentUserID,
-            recipient: group.members,
-            groupId: group._id,
+            recipient: group._id,
+            onModel: 'Groups',
         }
 
         ws.send(JSON.stringify(typingMessage))
     }
 
     return (
-        <div className="w-full flex">
-            <div className="m-2 p-2 bg-stone-800 flex flex-grow h-min-[50px] rounded-2xl text-xl">
+        <div className="bg-transparent overflow-visible  w-full flex">
+            <div className="shadow-2xl hex border-2 border-stone-700 m-6 p-2 bg-stone-800 flex flex-grow h-min-[50px] rounded-2xl text-xl">
                 <input
                     value={message}
                     onChange={handleChange}

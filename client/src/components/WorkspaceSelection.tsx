@@ -1,27 +1,18 @@
-import { useState } from 'react'
+import { useState, Dispatch, SetStateAction } from 'react'
 import { WorkspaceType } from '../types'
 import { useNavigate } from 'react-router-dom'
 import Popup from 'reactjs-popup'
 import CreateWorkspace from './CreateWorkspace'
-
-const ITEM_HEIGHT = 48
+import DoneIcon from '@mui/icons-material/Done'
 
 interface Props {
     activeWorkspace: WorkspaceType | undefined // Assuming activeWorkspace might not be set initially
     workspaces: WorkspaceType[]
-    setActiveWorkspace: React.Dispatch<React.SetStateAction<WorkspaceType | undefined>> // Updated type for useState setter
+    setActiveWorkspace: Dispatch<SetStateAction<WorkspaceType | undefined>> // Updated type for useState setter
+    setWorkspaces: Dispatch<SetStateAction<WorkspaceType[]>>
 }
-export default function WorkspaceSelection({ setActiveWorkspace, activeWorkspace, workspaces }: Props) {
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-    const open = Boolean(anchorEl)
+export default function WorkspaceSelection({ setActiveWorkspace, activeWorkspace, workspaces, setWorkspaces }: Props) {
     const navigate = useNavigate()
-
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget)
-    }
-    const handleClose = () => {
-        setAnchorEl(null)
-    }
 
     const selectWorkspace = (workspace: WorkspaceType) => {
         setActiveWorkspace(workspace)
@@ -31,11 +22,11 @@ export default function WorkspaceSelection({ setActiveWorkspace, activeWorkspace
     const [isOpen, setIsOpen] = useState(false)
     return (
         <>
-            <div className=" flex flex-row text-[30px] text-stone-400 mb-6 items-center justify-center">
+            <div className="z-10 font-noto flex flex-row text-[30px] text-stone-400 mb-6 items-center justify-center">
                 <div className="relative inline-block  w-full">
                     <button
-                        onClick={() => setIsOpen(!isOpen)}
                         className="hover:bg-stone-900 rounded-2xl p-4 items-center justify-center inline-flex w-full focus-visible:ring-opacity-75"
+                        onClick={() => setIsOpen(!isOpen)}
                     >
                         {activeWorkspace === undefined ? '' : activeWorkspace?.name}
                     </button>
@@ -46,19 +37,21 @@ export default function WorkspaceSelection({ setActiveWorkspace, activeWorkspace
                         }`}
                         style={{ transformOrigin: 'center center' }}
                     >
-                        <div className="overflow-hidden rounded-lg shadow shadow-stone-950 ring-1 ring-black ring-opacity-5">
+                        <div className="overflow-hidden rounded-lg shadow-2xl border-stone-700 border-2 shadow-stone-950 ring-1 ring-black ring-opacity-5">
                             <div className="items-start bg-[#292221] p-1 hex flex-col">
                                 {workspaces.map((workspace: WorkspaceType) => {
                                     return (
                                         <button
                                             onClick={() => selectWorkspace(workspace)}
-                                            className="text-start rounded-lg block p-2 text-[20px] text-white hover:bg-stone-900 w-full"
+                                            className="flex justify-between items-center text-start rounded-lg p-2 text-[20px] text-white hover:bg-stone-900 w-full"
                                         >
-                                            <div className="pl-1">
-                                                {workspace.name +
-                                                    (activeWorkspace?.name === workspace.name ? ' -' : '')}
+                                            <div>
+                                                <div className="pl-1">{workspace.name}</div>
+                                                <div className="text-[16px] p-1 text-stone-400">4 members</div>
                                             </div>
-                                            <div className="text-[16px] p-1 text-stone-400">4 members</div>
+                                            <div className="pr-2">
+                                                {activeWorkspace?.name === workspace.name && <DoneIcon></DoneIcon>}
+                                            </div>
                                         </button>
                                     )
                                 })}
@@ -73,7 +66,15 @@ export default function WorkspaceSelection({ setActiveWorkspace, activeWorkspace
                                         nested
                                         position="center center"
                                     >
-                                        {((close: any) => <CreateWorkspace />) as unknown as React.ReactNode}
+                                        {
+                                            ((close: any) => (
+                                                <CreateWorkspace
+                                                    selectWorkspace={selectWorkspace}
+                                                    workspaces={workspaces}
+                                                    setWorkspaces={setWorkspaces}
+                                                />
+                                            )) as unknown as React.ReactNode
+                                        }
                                     </Popup>
                                 </div>
                             </div>

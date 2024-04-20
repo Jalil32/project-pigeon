@@ -12,12 +12,12 @@ import (
 )
 
 type Message struct {
-	Content   string   `json:"content"`
-	Recipient []string `json:"recipient"`
-	SentFrom  string   `json:"sentFrom"`
-	Timestamp int64    `json:"timestamp"`
-	Typing    bool     `json:"typing"`
-	GroupId   string   `json:"groupId"` // Group ID to identify the target group
+	Content   string `json:"content"`
+	Recipient string `json:"recipient"`
+	SentFrom  string `json:"sentFrom"`
+	Timestamp int64  `json:"timestamp"`
+	Typing    bool   `json:"typing"`
+	OnModel   string `json:"onModel"`
 }
 
 // Structure to manage group memberships and connections

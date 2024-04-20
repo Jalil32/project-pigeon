@@ -1,5 +1,8 @@
 import mongoose, { Schema } from 'mongoose';
 import crypto from 'crypto';
+import { NextFunction } from 'express';
+import Groups from './groupModel';
+import Users from './userModel';
 
 // Group Schema
 const workspaceSchema = new mongoose.Schema({
@@ -43,6 +46,18 @@ workspaceSchema.methods.createPasswordResetToken = function () {
 
     return resetToken;
 };
+
+workspaceSchema.pre('findOneAndDelete', async function (next) {
+    const workspaceId = this.getQuery()._id;
+    await Groups.deleteMany({ workspace: workspaceId });
+    next();
+});
+
+workspaceSchema.pre('findOneAndDelete', async function (next) {
+    const workspaceId = this.getQuery()._id;
+    await Users.updateMany({ workspaces: workspaceId }, { $pull: { workspaces: workspaceId } });
+    next();
+});
 
 const Workspaces = mongoose.model('Workspaces', workspaceSchema);
 

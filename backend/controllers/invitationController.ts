@@ -39,6 +39,7 @@ export const handleInvitations = catchAsync(
             const resetToken = crypto.randomBytes(32).toString('hex');
             let invitationToken = crypto.createHash('sha256').update(resetToken).digest('hex');
             console.log('token created for', inviteeEmail);
+
             // make sure token is unique
             while (
                 (await Invitations.findOne({ invitationToken: invitationToken }).exec()) !== null
@@ -50,7 +51,6 @@ export const handleInvitations = catchAsync(
             const invitationTokenExpiration = Date.now() + 24 * 60 * 60 * 1000;
 
             // store invitation in database
-
             console.log('creating new invitation in db');
 
             const newInvite = await Invitations.create({

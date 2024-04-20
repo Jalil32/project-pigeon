@@ -6,7 +6,7 @@ interface MessageType {
     content: string
     timestamp: number
     recipient: string
-    groupId: string
+    onModel: string
 }
 
 interface Member {
@@ -30,14 +30,14 @@ function Message({ message, members, currentUserId }: Props) {
                     key={message.timestamp}
                     className={`flex ${message.sentFrom === currentUserId ? 'justify-end' : 'justify-start'}`}
                 >
-                    <div className={`flex flex-row max-w-[60%] `}>
-                        <div className="flex items-end flex-col ">
+                    <div className={` flex flex-row break-words max-w-[60%]  `}>
+                        <div className="flex items-end flex-col break-words">
                             <div
-                                className={` text-purple-800 ml-3 mr-3 text-[16px] font-semibold w-fit justify-end items-end `}
+                                className={`text-purple-800 ml-3 mr-3 text-[16px] font-semibold justify-end items-end `}
                             >
                                 {members[message.sentFrom]?.firstName || 'error'}
                             </div>
-                            <div className="flex-grow p-3 h-auto bg-stone-800 rounded-2xl">{message.content}</div>
+                            <div className="p-3 h-fit bg-stone-800 rounded-2xl break-all ">{message.content}</div>
                             <div className="mr-3 font-semibold text-stone-600 text-[12px]">
                                 {new Date(message.timestamp).toLocaleString()}
                             </div>
@@ -82,7 +82,9 @@ function Message({ message, members, currentUserId }: Props) {
                             >
                                 {members[message.sentFrom]?.firstName || 'error'}
                             </div>
-                            <div className="flex-grow p-3 h-auto bg-stone-800 rounded-2xl">{message.content}</div>
+                            <div className="flex-grow p-3 h-auto break-all bg-stone-800 rounded-2xl">
+                                {message.content}
+                            </div>
                             <div className="ml-3 font-semibold text-stone-600 text-[12px]">
                                 {new Date(message.timestamp).toLocaleString()}
                             </div>

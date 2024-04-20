@@ -8,19 +8,19 @@ import { FormEvent } from 'react'
 import axios from 'axios'
 import { redirect, useParams } from 'react-router-dom'
 import { error } from 'console'
+import { WorkspaceType } from '../types'
 
 interface props {
-    setGroups: (data: any) => void
-    groups: any
     close?: any
-    activeWorkspace: any
+    activeWorkspace: WorkspaceType
 }
 
-export default function CreateTeam({ setGroups, groups, close, activeWorkspace }: props) {
+function InvitePopup({ close, activeWorkspace }: props) {
     const navigate = useNavigate()
     const [email, setEmail] = useState('')
     const [emails, setEmails] = useState<string[]>([])
     const workspaceId = useParams().workspaceId
+    const [emailsSent, setEmailsSent] = useState(false)
 
     function handleAddMember() {
         setEmails((emails) => {
@@ -50,35 +50,16 @@ export default function CreateTeam({ setGroups, groups, close, activeWorkspace }
         try {
             event.preventDefault()
 
-            const fd = new FormData(event.target)
-            const data = Object.fromEntries(fd.entries())
-            const name = data.name
-            const user = JSON.parse(localStorage.getItem('user') ?? '')
-            let userId = ''
+            const inviteeEmails = emails
 
-            if (user) {
-                userId = user._id
-            }
+            const response = await axios.post('/api/v1/workspace/invite', {
+                workspaceId,
+                inviteeEmails,
+            })
 
-            const request = {
-                name: name,
-                creator: userId,
-                workspace: activeWorkspace._id,
-                members: activeWorkspace.members,
-            }
-
-            const response = await axios.post('/api/v1/group', request)
-            if (response.status === 201) {
-                const groupToAdd = response.data.data.group
-
-                const navigateTo = `/workspace/${workspaceId}/team/${groupToAdd._id}`
-
-                setGroups((groups: any) => {
-                    return [...groups, groupToAdd]
-                })
-
-                close()
-                navigate(navigateTo)
+            if (response.status === 200) {
+                console.log('invitations sent!')
+                setEmailsSent(true)
             }
         } catch (error) {
             console.error('error:', error)
@@ -89,17 +70,26 @@ export default function CreateTeam({ setGroups, groups, close, activeWorkspace }
         <div className="w-[500px] h-[500px] bg-stone-800 rounded-2xl shadow-2xl p-8">
             <div className=" md:space-y-8 lg:space-y-8 space-y-4 lg:text-[35px] md:text-[30px] sm:text-[30px] text-stone-400 font-noto font-bold">
                 <div className="flex flex-row justify-between">
-                    <div>Create Team</div>
+                    <div>Invite People</div>
                     <button className="hover:text-sky-400" onClick={close}>
                         x
                     </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="md:space-y-8 lg:space-y-8 space-y-4 text-[20px]">
-                    <LoginInput name="name" label="Name" />
-                    <LoginButton type="submit" buttonText="Create Team" />
+                    <AddMemberInput
+                        handleInput={handleInput}
+                        handleAddMember={handleAddMember}
+                        handleRemoveMember={handleRemoveMember}
+                        email={email}
+                        emails={emails}
+                    />
+                    <LoginButton type="submit" buttonText="Send Invites" />
                 </form>
+                {emailsSent && <div>Emails have been sent!</div>}
             </div>
         </div>
     )
 }
+
+export default InvitePopup
