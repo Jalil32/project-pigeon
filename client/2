@@ -1,0 +1,19 @@
+function LoginPage() {
+    return (
+        <div className="bg-gradient-to-tr from-green-400 to-cyan-600 flex w-screen h-screen items-center justify-center">
+            <div className="p-14 shadow-2xl rounded-[55px] bg-stone-700 h-2/3 w-[500px] ">
+                <h1>Pigeon</h1>
+                <div className="font-noto-serif text-[40px]">
+                    Create <div>New Account</div>
+                </div>
+                <h1>Already a member? Log in</h1>
+                <input value={'First Name'} />
+                <input value={'Last Name'} />
+                <input value={'Email'} />
+                <input value={'Password'} />
+            </div>
+        </div>
+    );
+}
+
+export default LoginPage;
